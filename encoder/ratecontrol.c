@@ -629,6 +629,11 @@ void x264_ratecontrol_init_reconfigurable( x264_t *h, int b_init )
     if( !b_init && rc->b_2pass )
         return;
 
+    if( h->param.rc.i_rc_method == X264_RC_ABR )
+    {
+        rc->wanted_bits_window = 1.0 * rc->bitrate / rc->fps;
+    }
+
     if( h->param.rc.i_rc_method == X264_RC_CRF )
     {
         /* Arbitrary rescaling to make CRF somewhat similar to QP.
@@ -2690,6 +2695,7 @@ void x264_thread_sync_ratecontrol( x264_t *cur, x264_t *prev, x264_t *next )
         COPY(prev_zone);
         COPY(mbtree.qpbuf_pos);
         /* these vars can be updated by x264_ratecontrol_init_reconfigurable */
+        COPY(fps);
         COPY(bitrate);
         COPY(buffer_size);
         COPY(buffer_rate);
